@@ -1,0 +1,14 @@
+{
+  "name": "trello-api-app",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "First Backend Project of ThuanDang follow MERN Pro tutorial",
+  "main": "src/server.js",
+  "repository": "https://github.com/Thuandang297/trello-api-app.git",
+  "author": "Thuandang",
+  "license": "ThuanDang",
+  "private": true,
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
