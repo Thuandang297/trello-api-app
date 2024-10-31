@@ -1,19 +1,24 @@
 /* eslint-disable no-console */
 
 import express from 'express'
-import { CONNECT_DB, GET_DB } from '~/config/mongodb'
+import exitHook from 'exit-hook'
+import { CLOSE_DB, CONNECT_DB } from '~/config/mongodb'
+import { env } from '~/config/environment'
 const START_SERVER = () => {
   const app = express()
-  const hostname = 'localhost'
-  const port = 8017
+  const hostname = env.APP_HOST
+  const port = env.APP_PORT
   console.log('3.Start server...')
   app.get('/', async (req, res) => {
-    console.log(await GET_DB().listCollections().toArray())
     res.end('<h1>Hello World!</h1><hr>')
-  })
 
+  })
   app.listen(port, hostname, () => {
-    console.log(`This app is running at hostname:${hostname} and port:${port}`)
+
+  })
+  exitHook(() => {
+    console.log('Server is shutting down!')
+    CLOSE_DB()
   })
 }
 
