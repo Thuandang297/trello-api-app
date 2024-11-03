@@ -4,15 +4,15 @@ import express from 'express'
 import exitHook from 'exit-hook'
 import { CLOSE_DB, CONNECT_DB } from '~/config/mongodb'
 import { env } from '~/config/environment'
+import { APIs_v1 } from './routes/v1'
 const START_SERVER = () => {
   const app = express()
   const hostname = env.APP_HOST
   const port = env.APP_PORT
   console.log('3.Start server...')
-  app.get('/', async (req, res) => {
-    res.end('<h1>Hello World!</h1><hr>')
 
-  })
+  app.use('/v1', APIs_v1)
+
   app.listen(port, hostname, () => {
 
   })
