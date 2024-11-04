@@ -1,8 +1,8 @@
 import express from 'express'
 import { StatusCodes } from 'http-status-codes'
-const routes = express.Router()
+const boardRoute = express.Router()
 
-routes.route('/')
+boardRoute.route('/')
   .get((req, res) => {
     res.status(StatusCodes.OK).json({ message: 'Note, api get ok' })
   })
@@ -10,4 +10,4 @@ routes.route('/')
     res.status(StatusCodes.CREATED).json({ message: 'Note, api created' })
   })
 
-export const BoardsRouter = routes
+export const BoardsRouter = boardRoute
