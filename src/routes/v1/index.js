@@ -1,6 +1,6 @@
 import express from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { BoardsRouter } from './boardRoutes'
+import { BoardsRouter } from './boardRoute'
 const routes = express.Router()
 
 //Check api v1 status
