@@ -11,6 +11,9 @@ const START_SERVER = () => {
   const port = env.APP_PORT
   console.log('3.Start server...')
 
+  //to use bodyRequest type json
+  app.use(express.json())
+
   app.use('/v1', APIs_v1)
 
   app.listen(port, hostname, () => {
