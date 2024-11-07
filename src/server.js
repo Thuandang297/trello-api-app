@@ -5,16 +5,19 @@ import exitHook from 'exit-hook'
 import { CLOSE_DB, CONNECT_DB } from '~/config/mongodb'
 import { env } from '~/config/environment'
 import { APIs_v1 } from './routes/v1'
+import { errorHandlingMiddleWare } from './middlewares/errorHandlingMiddleware'
 const START_SERVER = () => {
   const app = express()
   const hostname = env.APP_HOST
   const port = env.APP_PORT
   console.log('3.Start server...')
-
   //to use bodyRequest type json
   app.use(express.json())
 
   app.use('/v1', APIs_v1)
+
+  app.use(errorHandlingMiddleWare)
+  //Using for handle error
 
   app.listen(port, hostname, () => {
 
