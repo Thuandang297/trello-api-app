@@ -1,6 +1,13 @@
+import { slugify } from '~/utils/formatter'
+
 const createNew = async (reqBody) => {
+  // eslint-disable-next-line no-useless-catch
   try {
-    console.log('reqBody', reqBody)
+    const newResponse={
+      ...reqBody,
+      slug: slugify(reqBody?.title)
+    }
+    return newResponse
   } catch (error) {
     throw error
   }
