@@ -1,18 +1,26 @@
 import { slugify } from '~/utils/formatter'
+import { boardModel } from '~/models/boardModel'
 
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const newResponse={
+    const newBoard={
       ...reqBody,
       slug: slugify(reqBody?.title)
     }
-    return newResponse
+    const createdBoard =await boardModel.createNew(newBoard)
+    const resultCreated = await boardModel.findById(createdBoard.insertedId)
+    return resultCreated
   } catch (error) {
     throw error
   }
 }
 
+const findBoardById = async (boardId) => {
+  return await boardModel.findById(boardId)
+}
+
 export const boardService ={
-  createNew
+  createNew,
+  findBoardById
 }

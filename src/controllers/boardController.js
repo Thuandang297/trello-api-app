@@ -15,4 +15,13 @@ const updateData = (req, res, next) => {
   } catch (error) {next(error)}
 }
 
-export const boardController = { createNew, updateData }
+const findById = async (req, res, next) => {
+  try {
+    const dataBoard = await boardService.createNew(req.body)
+    res.status(StatusCodes.OK).json({ dataBoard })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const boardController = { createNew, updateData, findById }
