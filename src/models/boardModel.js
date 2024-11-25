@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
@@ -14,9 +15,15 @@ const BOARD_COLLECTION_SCHEMA =Joi.object({
 
 })
 
+const validateBeforeCreate = async (data) => {
+  return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
+}
+
 const createNew = async (data) => {
   try {
-    return await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(data)
+    const validData = await validateBeforeCreate(data)
+    if (!validData) return
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
   } catch (error) {
     throw new Error(error)
   }
@@ -25,7 +32,7 @@ const createNew = async (data) => {
 const findById = async (boardId) => {
   try {
     return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne(
-      { _id: boardId })
+      { _id: new ObjectId(boardId) })
   } catch (error) {
     throw new Error(error)
   }
