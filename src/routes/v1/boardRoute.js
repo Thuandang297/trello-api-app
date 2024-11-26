@@ -7,4 +7,6 @@ boardRoute.route('/')
   .post(boardValidation.createNew, boardController.createNew)
   .put(boardValidation.updateData, boardController.updateData)
 
+boardRoute.route('/:id')
+  .get(boardController.findById)
 export const BoardsRouter = boardRoute

@@ -17,7 +17,7 @@ const createNew = async (reqBody) => {
 }
 
 const findBoardById = async (boardId) => {
-  return await boardModel.findById(boardId)
+  return await boardModel.getDetails(boardId)
 }
 
 export const boardService ={
