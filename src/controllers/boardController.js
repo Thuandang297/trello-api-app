@@ -17,7 +17,11 @@ const updateData = (req, res, next) => {
 
 const findById = async (req, res, next) => {
   try {
-    const dataBoard = await boardService.createNew(req.body)
+    const boardId=req.params.id
+    const dataBoard = await boardService.findBoardById(boardId)
+    if (!dataBoard) {
+      throw new Error(StatusCodes.NOT_FOUND, 'Board is not found!')
+    }
     res.status(StatusCodes.OK).json({ dataBoard })
   } catch (error) {
     next(error)
