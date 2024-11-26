@@ -1,4 +1,5 @@
 import 'dotenv/config'
+console.log(process.env.BUILD_MODE);
 
 export const env = {
   APP_HOST: process.env.APP_HOST,
