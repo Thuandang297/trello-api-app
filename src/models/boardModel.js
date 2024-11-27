@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
+import { TYPE_BOARDS } from '~/utils/constants'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const BOARD_COLLECTION_NAME ='board'
@@ -11,8 +12,8 @@ const BOARD_COLLECTION_SCHEMA =Joi.object({
   columnOrderIds: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
   createdAt:Joi.date().timestamp('javascript').default(Date.now),
   updatedAt:Joi.date().timestamp('javascript').default(null),
-  _destroy:Joi.boolean().default(false)
-
+  _destroy:Joi.boolean().default(false),
+  type: Joi.string().valid(TYPE_BOARDS.PRIVATE, TYPE_BOARDS.PUBLIC).required()
 })
 
 const validateBeforeCreate = async (data) => {
