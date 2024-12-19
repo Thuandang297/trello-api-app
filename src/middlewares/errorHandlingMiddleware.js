@@ -8,6 +8,6 @@ export const errorHandlingMiddleWare = (err, req, res, next) => {
     message: err.message || err[StatusCodes.INTERNAL_SERVER_ERROR],
     stack: err.stack //Help to trace bug with the information when log it out
   }
-  if (env.BUILD_MODE !='dev') delete responseErrors.stack
+  if (env.BUILD_MODE !='development') delete responseErrors.stack
   return res.status(responseErrors.statusCode).json({ responseErrors })
 }

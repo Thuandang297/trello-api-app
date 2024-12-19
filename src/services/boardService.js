@@ -7,7 +7,7 @@ import { StatusCodes } from 'http-status-codes'
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const newBoard={
+    const newBoard = {
       ...reqBody,
       slug: slugify(reqBody?.title)
     }
@@ -18,8 +18,8 @@ const createNew = async (reqBody) => {
 }
 
 const findBoardById = async (boardId) => {
-  const boardDetail= await boardModel.getDetails(boardId)
-  if (!boardDetail) throw new ApiError(StatusCodes.NOT_FOUND,'Can not find the board')
+  const boardDetail = await boardModel.getDetails(boardId)
+  if (!boardDetail) throw new ApiError(StatusCodes.NOT_FOUND, 'Can not find the board')
   const response = cloneDeep(boardDetail)
   const { cards } = response
   response.columns.forEach(column => {
@@ -29,7 +29,7 @@ const findBoardById = async (boardId) => {
   return response
 }
 
-export const boardService ={
+export const boardService = {
   createNew,
   findBoardById
 }
