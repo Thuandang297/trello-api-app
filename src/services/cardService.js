@@ -3,10 +3,7 @@ import { cardModel } from '~/models/cardModel'
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const newCard={
-      ...reqBody
-    }
-    return await cardModel.createNew(newCard)
+    return await cardModel.createNew(reqBody)
   } catch (error) {
     throw error
   }
@@ -15,10 +12,7 @@ const createNew = async (reqBody) => {
 const updateData = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const updatedCard = {
-      ...reqBody
-    }
-    return await cardModel.updateData(updatedCard)
+    return await cardModel.updateData(reqBody)
   } catch (error) {
     throw error
   }

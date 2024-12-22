@@ -17,6 +17,19 @@ const createNew = async (reqBody) => {
   }
 }
 
+const updateBoard = async (reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const newBoard = {
+      ...reqBody,
+      slug: slugify(reqBody?.title)
+    }
+    return await boardModel.updateBoard(newBoard)
+  } catch (error) {
+    throw error
+  }
+}
+
 const findBoardById = async (boardId) => {
   const boardDetail = await boardModel.getDetails(boardId)
   if (!boardDetail) throw new ApiError(StatusCodes.NOT_FOUND, 'Can not find the board')
@@ -31,5 +44,6 @@ const findBoardById = async (boardId) => {
 
 export const boardService = {
   createNew,
+  updateBoard,
   findBoardById
 }
