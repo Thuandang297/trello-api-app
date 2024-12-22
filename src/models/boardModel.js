@@ -67,6 +67,21 @@ const findById = async (boardId) => {
   }
 }
 
+const pushInColumnOrderIds = async (boardId, columnId) => {
+  try {
+    const updatedBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({
+      _id: new ObjectId(boardId)
+    }, {
+      $push:{
+        columnOrderIds: columnId
+      }
+    }, { returnDocument: 'after' })
+    return updatedBoard
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const getDetails = async (boardId) => {
   try {
     const result = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
@@ -105,5 +120,6 @@ export const boardModel ={
   createNew,
   findById,
   getDetails,
-  updateBoard
+  updateBoard,
+  pushInColumnOrderIds
 }

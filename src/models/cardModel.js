@@ -2,7 +2,7 @@ import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
-
+import { columnModel } from './columnModel'
 // Define Collection (name & schema)
 const CARD_COLLECTION_NAME = 'cards'
 const CARD_COLLECTION_SCHEMA = Joi.object({
@@ -38,7 +38,13 @@ const createNew = async (data) => {
       columnId: new ObjectId(validData?.columnId)
     }
     if (!createdData) return
-    return await GET_DB().collection(CARD_COLLECTION_NAME).insertOne(createdData)
+    const createdCard = await GET_DB().collection(CARD_COLLECTION_NAME).insertOne(createdData)
+
+    // Insert into Column.cardOrderIds
+    columnModel.pushInCardOrderIds(validData?.columnId, createdCard.insertedId)
+
+    //Return value of created card
+    return await GET_DB().collection(CARD_COLLECTION_NAME).findOne({ _id: createdCard.insertedId })
   } catch (error) {
     throw new Error(error)
   }

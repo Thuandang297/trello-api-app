@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
+import { boardModel } from './boardModel'
 // Define Collection (name & schema)
 const COLUMN_COLLECTION_NAME = 'columns'
 
@@ -37,7 +38,10 @@ const createNew = async (data) => {
     }
     if (!createdData) return
     const createdColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(createdData)
-    return createdColumn
+
+    //Add createdColumnId in Board.columnOrderIds
+    await boardModel.pushInColumnOrderIds(validData?.boardId, createdColumn.insertedId)
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({ _id: createdColumn.insertedId })
   } catch (error) {
     throw new Error(error)
   }
@@ -57,9 +61,25 @@ const updateData = async (data) => {
   }
 }
 
+const pushInCardOrderIds = async (columnId, cardId) => {
+  try {
+    const updatedColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({
+      _id: new ObjectId(columnId)
+    }, {
+      $push:{
+        cardOrderIds: cardId
+      }
+    }, { returnDocument: 'after' })
+    return updatedColumn
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
-  updateData
+  updateData,
+  pushInCardOrderIds
 }
