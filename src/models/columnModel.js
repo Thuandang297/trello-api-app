@@ -36,7 +36,8 @@ const createNew = async (data) => {
       boardId: new ObjectId(validData?.boardId)
     }
     if (!createdData) return
-    return await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(createdData)
+    const createdColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(createdData)
+    return createdColumn
   } catch (error) {
     throw new Error(error)
   }
