@@ -4,7 +4,7 @@ import ApiError from '~/utils/ApiError'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 const createNew = async (req, res, next) => {
   const correctCondition = Joi.object({
-    boardId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     title: Joi.string().required().min(3).max(50).trim().strict(),
   })
   try {
