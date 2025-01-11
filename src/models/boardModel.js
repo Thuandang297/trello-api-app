@@ -49,7 +49,8 @@ const updateBoard = async (req) => {
       slug: req.slug,
       description: req.description,
       updatedAt: Date.now(),
-      type: req.type }
+      type: req.type,
+      columnOrderIds: req.columnOrderIds }
     },
     { returnDocument: 'after', upsert: true })
     return updatedData
