@@ -24,7 +24,5 @@ export const GET_DB = () => {
 
 //Closing DB
 export const CLOSE_DB = async () => {
-  console.log('4.Closing db...')
   await mongoClientInstance.close()
-  console.log('5.Closing db completed...')
 }
