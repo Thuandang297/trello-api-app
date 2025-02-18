@@ -9,5 +9,5 @@ export const errorHandlingMiddleWare = (err, req, res) => {
     stack: err.stack //Help to trace bug with the information when log it out
   }
   if (env.BUILD_MODE !='development') delete responseErrors.stack
-  return res.status(responseErrors.statusCode).json({ responseErrors })
+  return res?.status(responseErrors.statusCode).json({ responseErrors })
 }

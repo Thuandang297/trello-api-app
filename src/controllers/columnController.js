@@ -10,9 +10,10 @@ const createNew = async (req, res, next) => {
   }
 }
 
-const updateData = (req, res, next) => {
+const updateData = async (req, res, next) => {
   try {
-    res.status(StatusCodes.ACCEPTED).json({ Create: 'Update by controller nha' })
+    const updatedColumn = await columnService.updateData(req)
+    res.status(StatusCodes.ACCEPTED).json({ ...updatedColumn })
   } catch (error) {next(error)}
 }
 

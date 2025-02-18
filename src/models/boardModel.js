@@ -8,7 +8,6 @@ import { cardModel } from './cardModel'
 
 const BOARD_COLLECTION_NAME ='board'
 const BOARD_COLLECTION_SCHEMA =Joi.object({
-  _id: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
   title: Joi.string().required().min(3).max(50).trim().strict(),
   slug: Joi.string().required().min(3).trim().strict(),
   description: Joi.string().required().min(3).max(256).trim().strict(),
@@ -39,19 +38,21 @@ const createNew = async (data) => {
 
 const updateBoard = async (req) => {
   try {
-    const validData = await validateBeforeCreate(req)
+    const boardId = req.params?.id
+    const validData = await validateBeforeCreate(req.body)
     if (!validData) return
-    const updatedData = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({
-      _id:new ObjectId(req._id)
-    },
-    { $set:{
-      title: req.title,
-      slug: req.slug,
-      description: req.description,
+    const updateFields = {
+      title: validData.title,
+      slug: validData.slug,
+      description: validData.description,
       updatedAt: Date.now(),
-      type: req.type,
-      columnOrderIds: req.columnOrderIds }
+      type: validData.type,
+      columnOrderIds: validData.columnOrderIds
+    }
+    const updatedData = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({
+      _id: new ObjectId(boardId)
     },
+    { $set: updateFields },
     { returnDocument: 'after', upsert: true })
     return updatedData
   } catch (error) {

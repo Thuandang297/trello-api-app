@@ -1,16 +1,16 @@
-import Joi from 'joi'
+import Joi, { date } from 'joi'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
 import { boardModel } from './boardModel'
+import { set } from 'lodash'
 // Define Collection (name & schema)
 const COLUMN_COLLECTION_NAME = 'columns'
 
 const COLUMN_COLLECTION_SCHEMA = Joi.object({
-  // boardId:Joi.required(),
   boardId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
   title: Joi.string().required().min(3).max(50).trim().strict(),
-  cards:Joi.array().default([]),
+  cards: Joi.array().default([]),
   // Lưu ý các item trong mảng cardOrderIds là ObjectId nên cần thêm pattern cho chuẩn
   cardOrderIds: Joi.array().items(
     Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
@@ -47,15 +47,26 @@ const createNew = async (data) => {
   }
 }
 
-const updateData = async (data) => {
+const updateData = async (req) => {
   try {
-    const validData = await validateBeforeUpdate(data)
-    const updatedData = {
-      ...validData,
-      boardId: new ObjectId(validData?.boardId)
+    const id = req.params?.id
+    const { body } = req
+    const validData = await validateBeforeUpdate(body)
+    if (!validData || !id) return
+    const updateFields ={
+      title: validData.title,
+      boardId: new ObjectId(validData.boardId),
+      cards: validData.cards,
+      cardOrderIds: validData.cardOrderIds,
+      updatedAt: Date.now()
     }
-    if (!updatedData) return
-    return await GET_DB().collection(COLUMN_COLLECTION_NAME).updateOne(updatedData)
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({
+      _id: new ObjectId(id)
+    },
+    {
+      $set: updateFields
+    },
+    { returnDocument: 'after', upsert: true })
   } catch (error) {
     throw new Error(error)
   }
@@ -66,7 +77,7 @@ const pushInCardOrderIds = async (columnId, cardId) => {
     const updatedColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({
       _id: new ObjectId(columnId)
     }, {
-      $push:{
+      $push: {
         cardOrderIds: cardId
       }
     }, { returnDocument: 'after' })

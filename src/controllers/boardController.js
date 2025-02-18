@@ -11,7 +11,7 @@ const createNew = async (req, res, next) => {
 
 const updateData = async (req, res, next) => {
   try {
-    const updatedBoard = await boardService.updateBoard(req.body)
+    const updatedBoard = await boardService.updateBoard(req)
     res.status(StatusCodes.OK).json({ updatedBoard })
   } catch (error) {next(error)}
 }
