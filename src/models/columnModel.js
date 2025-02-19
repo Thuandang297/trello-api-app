@@ -21,12 +21,20 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+const COLUMN_COLLECTION_SCHEMA_UPDATE = Joi.object({
+  boardId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  cardOrderIds: Joi.array().items(
+    Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+  ).default([]),
+
+})
+
 const validateBeforeCreate = async (data) => {
   return await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
 
 const validateBeforeUpdate = async (data) => {
-  return await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
+  return await COLUMN_COLLECTION_SCHEMA_UPDATE.validateAsync(data, { abortEarly: false })
 }
 
 const createNew = async (data) => {
@@ -54,9 +62,7 @@ const updateData = async (req) => {
     const validData = await validateBeforeUpdate(body)
     if (!validData || !id) return
     const updateFields ={
-      title: validData.title,
       boardId: new ObjectId(validData.boardId),
-      cards: validData.cards,
       cardOrderIds: validData.cardOrderIds,
       updatedAt: Date.now()
     }
@@ -90,6 +96,7 @@ const pushInCardOrderIds = async (columnId, cardId) => {
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
+  COLUMN_COLLECTION_SCHEMA_UPDATE,
   createNew,
   updateData,
   pushInCardOrderIds

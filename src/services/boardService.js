@@ -37,13 +37,11 @@ const findBoardById = async (boardId) => {
     //Get cards of each column
     const cardsOfEachColumn = cards.filter(card => (card.columnId.equals(column._id)))
     const mapOrderedCards = mapOrder(cardsOfEachColumn, column.cardOrderIds, '_id')
-    console.log("🚀 ~ findBoardById ~ mapOrderedCards:", mapOrderedCards)
-    console.log("column.cardOrderIds", column.cardOrderIds);
-    
     //Map the order by column.cardOrderIds
     column.cards = mapOrderedCards
+    return column
   })
-  delete response.cards
+  // delete response.cards
   return response
 }
 
