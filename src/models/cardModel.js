@@ -21,12 +21,15 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+const ALLOW_FIELD_UPDATED = ['boardId', 'columnId', 'title', 'cardOrderIds', 'cards']
+
 const validateBeforeCreate = async (data) => {
   return await CARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
 
-const validateBeforeUpdate = async (data) => {
-  return await CARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
+const validateBeforeUpdate = (body) => {
+  const bodyKeys = Object.keys(body)
+  return bodyKeys.every(key => ALLOW_FIELD_UPDATED.includes(key))
 }
 
 const createNew = async (data) => {
@@ -50,16 +53,23 @@ const createNew = async (data) => {
   }
 }
 
-const updateData = async (data) => {
+const updateData = async (cardId, data) => {
   try {
-    const validData = await validateBeforeUpdate(data)
+    const validData = validateBeforeUpdate(data)
+    if (!validData) return
     const updatedData = {
-      ...validData,
-      boardId: new ObjectId(validData?.boardId),
-      columnId: new ObjectId(validData?.columnId)
+      ...data,
+      updatedAt: Date.now()
     }
-    if (!updatedData) return
-    return await GET_DB().collection(CARD_COLLECTION_NAME).updateOne(updatedData)
+    data?.boardId ? updatedData.boardId = new ObjectId(data?.boardId) : delete updatedData['boardId']
+    data?.columnId ? updatedData.columnId = new ObjectId(data?.columnId) : delete updatedData['columnId']
+    return await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate({
+      _id: new ObjectId(cardId)
+    },
+    {
+      $set: updatedData
+    },
+    { returnDocument: 'after', upsert: true })
   } catch (error) {
     throw new Error(error)
   }

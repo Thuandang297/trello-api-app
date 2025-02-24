@@ -9,9 +9,10 @@ const createNew = async (req, res, next) => {
   }
 }
 
-const updateData = (req, res, next) => {
+const updateData = async (req, res, next) => {
   try {
-    res.status(StatusCodes.ACCEPTED).json({ Create: 'Update by controller nha' })
+    const updatedCard = await cardService.updateData(req.body)
+    res.status(StatusCodes.ACCEPTED).json({ updatedCard })
   } catch (error) {next(error)}
 }
 

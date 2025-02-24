@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { env } from '~/config/environment'
 
-export const errorHandlingMiddleWare = (err, req, res) => {
+export const errorHandlingMiddleWare = (err, req, res, next) => {
   if (!err.statusCode) err.statusCode = StatusCodes.INTERNAL_SERVER_ERROR
   const responseErrors = {
     statusCode: err.statusCode,
@@ -9,5 +9,6 @@ export const errorHandlingMiddleWare = (err, req, res) => {
     stack: err.stack //Help to trace bug with the information when log it out
   }
   if (env.BUILD_MODE !='development') delete responseErrors.stack
-  return res.status(responseErrors.statusCode).json({ responseErrors })
+  next()
+  return res?.status(responseErrors.statusCode).json({ responseErrors })
 }

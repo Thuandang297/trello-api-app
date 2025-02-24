@@ -3,6 +3,7 @@ import { boardModel } from '~/models/boardModel'
 import cloneDeep from 'lodash/cloneDeep'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
+import { mapOrder } from '~/utils/sorts'
 
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -17,14 +18,11 @@ const createNew = async (reqBody) => {
   }
 }
 
-const updateBoard = async (reqBody) => {
+const updateBoard = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const newBoard = {
-      ...reqBody,
-      slug: slugify(reqBody?.title)
-    }
-    return await boardModel.updateBoard(newBoard)
+    req.body.slug = slugify(req?.body.title)
+    return await boardModel.updateBoard(req)
   } catch (error) {
     throw error
   }
@@ -36,9 +34,14 @@ const findBoardById = async (boardId) => {
   const response = cloneDeep(boardDetail)
   const { cards } = response
   response.columns.forEach(column => {
-    column.cards = cards.filter(card => (card.columnId.equals(column._id)))
+    //Get cards of each column
+    const cardsOfEachColumn = cards.filter(card => (card.columnId.equals(column._id)))
+    const mapOrderedCards = mapOrder(cardsOfEachColumn, column.cardOrderIds, '_id')
+    //Map the order by column.cardOrderIds
+    column.cards = mapOrderedCards
+    return column
   })
-  delete response.cards
+  // delete response.cards
   return response
 }
 

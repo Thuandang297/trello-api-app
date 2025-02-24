@@ -9,10 +9,12 @@ const createNew = async (reqBody) => {
   }
 }
 
-const updateData = async (reqBody) => {
+const updateData = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    return await columnModel.updateData(reqBody)
+    const columnId = req.params.id
+    const body = req.body
+    return await columnModel.updateData(columnId, body)
   } catch (error) {
     throw error
   }

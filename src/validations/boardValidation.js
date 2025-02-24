@@ -20,8 +20,6 @@ const createNew =async (req, res, next) => {
 
 const updateData = async (req, res, next) => {
   const correctCondition = Joi.object({
-    _id: Joi.string().required().trim().messages({
-    }),
     title: Joi.string().min(3).max(50).trim().strict(),
     description: Joi.string().min(3).max(256).trim().strict(),
     type: Joi.string().valid(TYPE_BOARDS.PRIVATE, TYPE_BOARDS.PUBLIC),
