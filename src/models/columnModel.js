@@ -1,9 +1,8 @@
-import Joi, { date } from 'joi'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
-import { GET_DB } from '~/config/mongodb'
+import Joi from 'joi'
 import { ObjectId } from 'mongodb'
+import { GET_DB } from '~/config/mongodb'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { boardModel } from './boardModel'
-import { set } from 'lodash'
 // Define Collection (name & schema)
 const COLUMN_COLLECTION_NAME = 'columns'
 
@@ -26,7 +25,7 @@ const COLUMN_COLLECTION_SCHEMA_UPDATE = Joi.object({
   cardOrderIds: Joi.array().items(
     Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
   ).default([]),
-
+  cards: Joi.array().default([])
 })
 
 const validateBeforeCreate = async (data) => {
@@ -93,11 +92,27 @@ const pushInCardOrderIds = async (columnId, cardId) => {
   }
 }
 
+const updateCardOrderIds = async (columnId, cardOrderIds) => {
+  try {
+    const updatedBoard = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({
+      _id: new ObjectId(columnId)
+    }, {
+      $set:{
+        cardOrderIds: cardOrderIds
+      }
+    }, { returnDocument: 'after' })
+    return updatedBoard
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   COLUMN_COLLECTION_SCHEMA_UPDATE,
   createNew,
   updateData,
-  pushInCardOrderIds
+  pushInCardOrderIds,
+  updateCardOrderIds
 }

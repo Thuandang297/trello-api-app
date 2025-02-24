@@ -65,9 +65,24 @@ const updateData = async (data) => {
   }
 }
 
+const movingCard = async (idCard, idNextColumn) => {
+  try {
+    return await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate({
+      _id: new ObjectId(idCard)
+    }, {
+      $set: {
+        columnId: idNextColumn
+      }
+    }, { returnDocument: 'after' })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
-  updateData
+  updateData,
+  movingCard
 }

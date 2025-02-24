@@ -21,7 +21,8 @@ const updateData = async (req, res, next) => {
     title: Joi.string().min(3).max(50).trim().strict(),
     cardOrderIds: Joi.array().items(
       Joi.string()
-    ).default([])
+    ).default([]),
+    cards: Joi.array().default([])
   })
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
