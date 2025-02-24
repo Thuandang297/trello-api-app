@@ -20,20 +20,15 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
-const COLUMN_COLLECTION_SCHEMA_UPDATE = Joi.object({
-  boardId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-  cardOrderIds: Joi.array().items(
-    Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-  ).default([]),
-  cards: Joi.array().default([])
-})
+const ALLOW_FIELD_UPDATED = ['boardId', 'title', 'cardOrderIds', 'cards']
 
 const validateBeforeCreate = async (data) => {
   return await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
 
 const validateBeforeUpdate = async (data) => {
-  return await COLUMN_COLLECTION_SCHEMA_UPDATE.validateAsync(data, { abortEarly: false })
+  const bodyKeys = Object.keys(data)
+  return bodyKeys.every(key => ALLOW_FIELD_UPDATED.includes(key))
 }
 
 const createNew = async (data) => {
@@ -54,19 +49,17 @@ const createNew = async (data) => {
   }
 }
 
-const updateData = async (req) => {
+const updateData = async (columnId, bodyReq) => {
   try {
-    const id = req.params?.id
-    const { body } = req
-    const validData = await validateBeforeUpdate(body)
-    if (!validData || !id) return
-    const updateFields ={
-      boardId: new ObjectId(validData.boardId),
-      cardOrderIds: validData.cardOrderIds,
+    const validData = await validateBeforeUpdate(bodyReq)
+    if (!validData || !columnId) return
+    const updateFields = {
+      ...bodyReq,
       updatedAt: Date.now()
     }
+    bodyReq.boardId ? updateFields.boardId = new ObjectId(bodyReq.boardId) : delete updateFields['boardId']
     return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({
-      _id: new ObjectId(id)
+      _id: new ObjectId(columnId)
     },
     {
       $set: updateFields
@@ -92,27 +85,10 @@ const pushInCardOrderIds = async (columnId, cardId) => {
   }
 }
 
-const updateCardOrderIds = async (columnId, cardOrderIds) => {
-  try {
-    const updatedBoard = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({
-      _id: new ObjectId(columnId)
-    }, {
-      $set:{
-        cardOrderIds: cardOrderIds
-      }
-    }, { returnDocument: 'after' })
-    return updatedBoard
-  } catch (error) {
-    throw new Error(error)
-  }
-}
-
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
-  COLUMN_COLLECTION_SCHEMA_UPDATE,
   createNew,
   updateData,
-  pushInCardOrderIds,
-  updateCardOrderIds
+  pushInCardOrderIds
 }

@@ -11,11 +11,13 @@ const movingCard = async (data) => {
       dropListCardIds
     } = data
     //1.Update data of drag column
-    columnModel.updateCardOrderIds(dragColumnId, dragListCardIds)
+    columnModel.updateData(dragColumnId, { cardOrderIds : dragListCardIds })
     //2.Update data of drop column
-    columnModel.updateCardOrderIds(dropColumnId, dropListCardIds)
+    columnModel.updateData(dropColumnId, { cardOrderIds : dropListCardIds })
     //3.Update data of moving card
-    cardModel.movingCard(cardId, dropColumnId)
+    cardModel.updateData(cardId, { columnId : dropColumnId })
+
+    return 'Success'
   } catch (error) {
     throw new Error(error)
   }

@@ -75,7 +75,7 @@ const pushInColumnOrderIds = async (boardId, columnId) => {
       _id: new ObjectId(boardId)
     }, {
       $push:{
-        columnOrderIds: columnId
+        columnOrderIds: columnId.toString()
       }
     }, { returnDocument: 'after' })
     return updatedBoard
