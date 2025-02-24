@@ -8,6 +8,7 @@ import { APIs_v1 } from './routes/v1'
 import { errorHandlingMiddleWare } from './middlewares/errorHandlingMiddleware'
 import { corsOptions } from './cors'
 import cors from 'cors'
+import { swaggerDocs } from './config/swagger'
 const START_SERVER = () => {
   const app = express()
   const hostname = env.APP_HOST
@@ -15,7 +16,11 @@ const START_SERVER = () => {
   console.log('3.Start server...')
   //to use bodyRequest type json
   app.use(express.json())
+
+
   app.use(cors(corsOptions))
+
+  swaggerDocs(app)
 
   app.use('/v1', APIs_v1)
 
@@ -23,8 +28,8 @@ const START_SERVER = () => {
   //Using for handle error
 
   app.listen(port, hostname, () => {
-
   })
+  // app.listen(5000, () => console.log('Server running on http://localhost:5000'))
   exitHook(() => {
     console.log('Server is shutting down!')
     CLOSE_DB()
