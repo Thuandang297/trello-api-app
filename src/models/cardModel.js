@@ -75,9 +75,28 @@ const updateData = async (cardId, data) => {
   }
 }
 
+const deleteData = async (columnId) => {
+  try {
+    const deleteData = {
+      _destroy:true,
+      updatedAt: Date.now()
+    }
+    return await GET_DB().collection(CARD_COLLECTION_NAME).updateMany({
+      columnId: new ObjectId(columnId)
+    },
+    {
+      $set: deleteData
+    },
+    { returnDocument: 'after', upsert: true })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
-  updateData
+  updateData,
+  deleteData
 }

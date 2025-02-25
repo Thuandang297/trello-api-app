@@ -20,7 +20,17 @@ const updateData = async (req) => {
   }
 }
 
+const deleteData = async (columnId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    return await columnModel.deleteData(columnId)
+  } catch (error) {
+    throw error
+  }
+}
+
 export const columnService ={
   createNew,
-  updateData
+  updateData,
+  deleteData
 }

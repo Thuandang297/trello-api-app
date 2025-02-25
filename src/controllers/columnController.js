@@ -17,6 +17,14 @@ const updateData = async (req, res, next) => {
   } catch (error) {next(error)}
 }
 
+const deleteData = async (req, res, next) => {
+  try {
+    const columnId=req.params.id
+    const response = await columnService.deleteData(columnId)
+    res.status(StatusCodes.ACCEPTED).json({ ...response })
+  } catch (error) {next(error)}
+}
+
 const findById = async (req, res, next) => {
   try {
     const boardId=req.params.id
@@ -30,4 +38,4 @@ const findById = async (req, res, next) => {
   }
 }
 
-export const columnController = { createNew, updateData, findById }
+export const columnController = { createNew, updateData, findById, deleteData }

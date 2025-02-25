@@ -30,9 +30,11 @@ const updateBoard = async (req) => {
 
 const findBoardById = async (boardId) => {
   const boardDetail = await boardModel.getDetails(boardId)
+  console.log("🚀 ~ findBoardById ~ boardDetail:", boardDetail)
   if (!boardDetail) throw new ApiError(StatusCodes.NOT_FOUND, 'Can not find the board')
   const response = cloneDeep(boardDetail)
   const { cards } = response
+   response.columns = response.columns.filter(e => !e._destroy)
   response.columns.forEach(column => {
     //Get cards of each column
     const cardsOfEachColumn = cards.filter(card => (card.columnId.equals(column._id)))
