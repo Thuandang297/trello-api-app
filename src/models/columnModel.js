@@ -3,7 +3,6 @@ import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { boardModel } from './boardModel'
-import { cardModel } from './cardModel'
 // Define Collection (name & schema)
 const COLUMN_COLLECTION_NAME = 'columns'
 
@@ -77,7 +76,6 @@ const deleteData = async (columnId) => {
       _destroy:true,
       updatedAt: Date.now()
     }
-    await cardModel.deleteData(columnId)
     return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({
       _id: new ObjectId(columnId)
     },
@@ -105,11 +103,21 @@ const pushInCardOrderIds = async (columnId, cardId) => {
   }
 }
 
+const getDetails = async (columnId) => {
+  try {
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOne(
+      { _id: new ObjectId(columnId) })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   updateData,
   deleteData,
-  pushInCardOrderIds
+  pushInCardOrderIds,
+  getDetails
 }
