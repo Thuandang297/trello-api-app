@@ -13,6 +13,9 @@ const START_SERVER = () => {
   const app = express()
   const hostLocal = env.APP_HOST_LOCAL
   const portLocal = env.APP_PORT_LOCAL
+  const hostProduct = env.APP_HOST_PRODUCT
+  const portProduct = env.APP_PORT_PRODUCT
+
 
   console.log('3.Start server...')
   //to use bodyRequest type json
@@ -29,8 +32,8 @@ const START_SERVER = () => {
   //Using for handle error
   //Check environment
   if (env.BUILD_MODE === 'production') {
-    console.log('4.Server is running in production mode at port:', env.APP_PORT)
-    app.listen(process.env.PORT, () => {
+    console.log(`4.Server is running in production mode at host: ${hostProduct} port: ${portProduct}`)
+    app.listen(portProduct, () => {
     })
   } else {
     console.log(`4.Server is running in development mode in ${hostLocal}:${portLocal}`)
