@@ -11,8 +11,9 @@ import cors from 'cors'
 import { swaggerDocs } from './config/swagger'
 const START_SERVER = () => {
   const app = express()
-  const hostname = env.APP_HOST
-  const port = env.APP_PORT
+  const hostLocal = env.APP_HOST_LOCAL
+  const portLocal = env.APP_PORT_LOCAL
+
   console.log('3.Start server...')
   //to use bodyRequest type json
   app.use(express.json())
@@ -26,10 +27,17 @@ const START_SERVER = () => {
 
   app.use(errorHandlingMiddleWare)
   //Using for handle error
+  //Check environment
+  if (env.BUILD_MODE === 'production') {
+    console.log('4.Server is running in production mode at port:', env.APP_PORT)
+    app.listen(env.APP_PORT, () => {
+    })
+  } else {
+    console.log(`4.Server is running in development mode in ${hostLocal}:${portLocal}`)
+    app.listen(portLocal, hostLocal, () => {
+    })
+  }
 
-  app.listen(port, hostname, () => {
-  })
-  // app.listen(5000, () => console.log('Server running on http://localhost:5000'))
   exitHook(() => {
     console.log('Server is shutting down!')
     CLOSE_DB()
