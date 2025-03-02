@@ -30,7 +30,7 @@ const START_SERVER = () => {
   //Check environment
   if (env.BUILD_MODE === 'production') {
     console.log('4.Server is running in production mode at port:', env.APP_PORT)
-    app.listen(env.APP_PORT, () => {
+    app.listen(process.env.PORT, () => {
     })
   } else {
     console.log(`4.Server is running in development mode in ${hostLocal}:${portLocal}`)
