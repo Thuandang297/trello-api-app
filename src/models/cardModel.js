@@ -75,7 +75,7 @@ const updateData = async (cardId, data) => {
   }
 }
 
-const deleteData = async (columnId) => {
+const deleteManyCardByColumnId = async (columnId) => {
   try {
     const deleteData = {
       _destroy:true,
@@ -98,5 +98,5 @@ export const cardModel = {
   CARD_COLLECTION_SCHEMA,
   createNew,
   updateData,
-  deleteData
+  deleteManyCardByColumnId
 }
