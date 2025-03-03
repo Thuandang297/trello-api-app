@@ -1,4 +1,4 @@
-export const WHITE_LIST_DOMAINS = ['https://trello-api-app.onrender.com']
+export const WHITE_LIST_DOMAINS = ['https://trello-api-app.onrender.com', 'https://vite-trello-web-base-projec-git-163c32-thuans-projects-2d033766.vercel.app', 'https://vite-trello-web-base-projec-git-163c32-thuans-projects-2d033766.vercel.app']
 // export const WHITE_LIST_DOMAINS = ['http://localhost:5173', 'http://localhost:5000']
 
 export const TYPE_BOARDS={
