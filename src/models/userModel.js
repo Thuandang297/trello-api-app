@@ -16,8 +16,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   email: Joi.string().required().email().trim().strict().pattern(EMAIL_RULE).message(EMAIL_RULE_MESSAGE),
   password: Joi.string().required().pattern(PASSWORD_RULE).min(8).max(256).trim().strict().message(PASSWORD_RULE_MESSAGE),
 
-  userName: Joi.string().required().min(3).max(50).trim().strict(),
-  displayName: Joi.string().required().min(3).max(50).trim().strict(),
+  userName: Joi.string().min(3).max(50).trim().strict(),
+  displayName: Joi.string().min(3).max(50).trim().strict(),
   avatar: Joi.string().default(null),
   role: Joi.string().valid(USER_ROLE.ADMIN, USER_ROLE.USER).default(USER_ROLE.USER),
 

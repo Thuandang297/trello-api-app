@@ -6,8 +6,8 @@ import { EMAIL_RULE, EMAIL_RULE_MESSAGE, PASSWORD_RULE, PASSWORD_RULE_MESSAGE } 
 var correctConditionCreate = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).message(EMAIL_RULE_MESSAGE),
   password: Joi.string().required().pattern(PASSWORD_RULE).message(PASSWORD_RULE_MESSAGE),
-  userName: Joi.string().required().min(3).max(50).trim().strict(),
-  displayName: Joi.string().required().min(3).max(50).trim().strict()
+  userName: Joi.string().min(3).max(50).trim().strict(),
+  displayName: Joi.string().min(3).max(50).trim().strict()
 })
 
 const createNew = async (req, res, next) => {
