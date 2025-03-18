@@ -44,17 +44,16 @@ const createNew = async (reqBody) => {
 const verify = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const { email, verifyCode } = reqBody
+    const { email, token } = reqBody
     /*  Check basic condition
     Check email not exist in service
     Check verifycation not equal verifyToken in db
     Check if user had actived*/
 
-    const existUser = userModel.findOneByEmail(email)
-
+    const existUser = await userModel.findOneByEmail(email)
     if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
     if (existUser.isActive) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'User was actived!')
-    if (verifyCode !== existUser.verifyToken) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'Verify token is fail!')
+    if (token !== existUser.verifyToken) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'Verify token is fail!')
     // Update data when verifired
 
     const updatedData = {
@@ -77,7 +76,7 @@ const login = async (reqBody) => {
   Check verifycation not equal verifyToken in db
   Check if user had actived*/
 
-  const existUser = userModel.findOneByEmail(email)
+  const existUser =await userModel.findOneByEmail(email)
 
   if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
   if (!existUser.isActive) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'User has not actived, please active user before login!')
@@ -86,24 +85,21 @@ const login = async (reqBody) => {
   const userInfo = { _id:existUser._id, email: existUser.email }
   //Create access token and user token to login with jsonwebtoken
 
-  const accessToken = JwtProvider.generateToken(
+  const accessToken = await JwtProvider.generateToken(
     userInfo, env.ACCESS_TOKEN_SECRET_SIGNATURE, env.ACCESS_TOKEN_LIFE
   )
 
-  const refreshToken = JwtProvider.generateToken(
+  const refreshToken = await JwtProvider.generateToken(
     userInfo, env.REFRESH_TOKEN_SECRET_SIGNATURE, env.REFRESH_TOKEN_LIFE
   )
   //Return user information with two tokens has retured
-
-  return { accessToken, refreshToken, ...pickUser(existUser)}
-
+  return { accessToken, refreshToken, ...pickUser(existUser) }
 }
 
 const getDetail = async (idUser) => {
   try {
     const result = await userModel.findOneById(idUser)
-    console.log('result:::', result);
-    
+    return pickUser(result)
   } catch (error) {
     return error
   }

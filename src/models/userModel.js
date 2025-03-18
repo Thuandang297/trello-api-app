@@ -21,7 +21,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   avatar: Joi.string().default(null),
   role: Joi.string().valid(USER_ROLE.ADMIN, USER_ROLE.USER).default(USER_ROLE.USER),
 
-  isActive: Joi.boolean().default(true),
+  isActive: Joi.boolean().default(false),
   verifyToken: Joi.string().default(null),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -76,13 +76,14 @@ const updateData = async (userId, data) => {
       ...data,
       updatedAt: Date.now()
     }
-    return await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate({
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate({
       _id: new ObjectId(userId)
     },
     {
       $set: updatedData
     },
     { returnDocument: 'after', upsert: true })
+    return result
   } catch (error) {
     throw new Error(error)
   }

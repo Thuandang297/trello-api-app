@@ -10,5 +10,5 @@ export const errorHandlingMiddleWare = (err, req, res, next) => {
   }
   if (env.BUILD_MODE !='development') delete responseErrors.stack
   next()
-  return res?.status(responseErrors.statusCode).json({ responseErrors })
+  return res?.status(responseErrors.statusCode).json({ ...responseErrors })
 }
