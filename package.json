@@ -25,6 +25,7 @@
     "http-status-codes": "^2.3.0",
     "joi": "^17.10.2",
     "joi-to-swagger": "^6.2.0",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mongodb": "^6.0.0",
     "swagger-jsdoc": "^6.2.8",
