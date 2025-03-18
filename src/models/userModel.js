@@ -53,6 +53,16 @@ const findOneByEmail = async (email) => {
   }
 }
 
+const findOneById= async (userId) => {
+  try {
+    const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne({ _id: new ObjectId(userId) })
+    return user
+  } catch (error) {
+    throw new Error(error)
+
+  }
+}
+
 const validateBeforeUpdate = (body) => {
   const bodyKeys = Object.keys(body)
   return !bodyKeys.some(key => INVALID_FIELD_UPDATED.includes(key))
@@ -82,5 +92,6 @@ export const userModel = {
   USER_COLLECTION_SCHEMA,
   createNew,
   updateData,
-  findOneByEmail
+  findOneByEmail,
+  findOneById
 }

@@ -6,6 +6,8 @@ import { uuid } from 'uuidv4'
 import { pickUser } from '~/utils/formatter'
 import { WEBSITE_DOMAIN } from '~/utils/constants'
 import { BrevoProvider } from '~/providers/brevoProvider'
+import { JwtProvider } from '~/providers/JwtProvider'
+import { env } from '~/config/environment'
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -24,7 +26,7 @@ const createNew = async (reqBody) => {
 
 
     const verficationLink = `${WEBSITE_DOMAIN}/account/verification?email=${newUser.email}&token=${newUser.verifyToken}`
-    const customSubject ='Trello Clone - Verify your email:Please verify your email address'
+    const customSubject = 'Trello Clone - Verify your email:Please verify your email address'
     const customHtml = `
     <h1>Verify your email address</h1>
     <p>Click the following link to verify your email address:</p>
@@ -35,9 +37,81 @@ const createNew = async (reqBody) => {
     BrevoProvider.sendEmail(newUser.email, customSubject, customHtml)
     return pickUser(newUser)
   } catch (error) {
-    throw error }
+    throw error
+  }
+}
+
+const verify = async (reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const { email, verifyCode } = reqBody
+    /*  Check basic condition
+    Check email not exist in service
+    Check verifycation not equal verifyToken in db
+    Check if user had actived*/
+
+    const existUser = userModel.findOneByEmail(email)
+
+    if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
+    if (existUser.isActive) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'User was actived!')
+    if (verifyCode !== existUser.verifyToken) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'Verify token is fail!')
+    // Update data when verifired
+
+    const updatedData = {
+      isActive: true,
+      verifyToken: null
+    }
+
+    const updatedUser = await userModel.updateData(existUser._id, updatedData)
+    return pickUser(updatedUser)
+  }
+  catch (error) {
+    throw error
+  }
+}
+
+const login = async (reqBody) => {
+  const { email, password } = reqBody
+  /*  Check basic condition
+  Check email not exist in service
+  Check verifycation not equal verifyToken in db
+  Check if user had actived*/
+
+  const existUser = userModel.findOneByEmail(email)
+
+  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
+  if (!existUser.isActive) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'User has not actived, please active user before login!')
+  if (!bcrypt.compareSync(password, existUser.password)) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'Email or password not true!')
+
+  const userInfo = { _id:existUser._id, email: existUser.email }
+  //Create access token and user token to login with jsonwebtoken
+
+  const accessToken = JwtProvider.generateToken(
+    userInfo, env.ACCESS_TOKEN_SECRET_SIGNATURE, env.ACCESS_TOKEN_LIFE
+  )
+
+  const refreshToken = JwtProvider.generateToken(
+    userInfo, env.REFRESH_TOKEN_SECRET_SIGNATURE, env.REFRESH_TOKEN_LIFE
+  )
+  //Return user information with two tokens has retured
+
+  return { accessToken, refreshToken, ...pickUser(existUser)}
+
+}
+
+const getDetail = async (idUser) => {
+  try {
+    const result = await userModel.findOneById(idUser)
+    console.log('result:::', result);
+    
+  } catch (error) {
+    return error
+  }
 }
 
 export const userService = {
-  createNew
+  createNew,
+  verify,
+  login,
+  getDetail
 }
