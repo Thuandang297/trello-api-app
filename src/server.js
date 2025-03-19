@@ -9,8 +9,11 @@ import { errorHandlingMiddleWare } from './middlewares/errorHandlingMiddleware'
 import { corsOptions } from './cors'
 import cors from 'cors'
 import { swaggerDocs } from './config/swagger'
+import cookieParser from 'cookie-parser'
 const START_SERVER = () => {
   const app = express()
+  //Config cookie-parse
+  app.use(cookieParser())
   const hostLocal = env.APP_HOST_LOCAL
   const portLocal = env.APP_PORT_LOCAL
   const hostProduct = env.APP_HOST_PRODUCT
@@ -21,6 +24,10 @@ const START_SERVER = () => {
   //to use bodyRequest type json
   app.use(express.json())
 
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
 
   app.use(cors(corsOptions))
 
