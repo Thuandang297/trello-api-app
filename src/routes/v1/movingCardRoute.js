@@ -1,7 +1,7 @@
 import express from 'express'
 import { movingCardValidation } from '~/validations/movingCardValidation'
 import { movingCardController } from '~/controllers/movingCardController'
-import  authMiddleware   from '~/middlewares/authMiddleware'
+import authMiddleware from '~/middlewares/authMiddleware'
 
 const movingCardRouter = express.Router()
 

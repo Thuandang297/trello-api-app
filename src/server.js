@@ -24,6 +24,10 @@ const START_SERVER = () => {
   //to use bodyRequest type json
   app.use(express.json())
 
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
 
   app.use(cors(corsOptions))
 

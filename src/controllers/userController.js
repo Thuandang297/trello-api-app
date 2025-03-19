@@ -23,14 +23,14 @@ const login = async (req, res, next) => {
   try {
     const result = await userService.login(req.body)
     //Thực hiện lưu cookie
-    res.cookie('accessToken',result.accessToken, {
+    res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
       sercure: true,
       sameSide: 'none',
       maxAge: ms('14 days')
     })
 
-    res.cookie('refreshToken',result.refreshToken, {
+    res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       sercure: true,
       sameSide: 'none',
