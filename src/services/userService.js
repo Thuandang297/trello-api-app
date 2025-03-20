@@ -76,13 +76,13 @@ const login = async (reqBody) => {
   Check verifycation not equal verifyToken in db
   Check if user had actived*/
 
-  const existUser =await userModel.findOneByEmail(email)
+  const existUser = await userModel.findOneByEmail(email)
 
   if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
   if (!existUser.isActive) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'User has not actived, please active user before login!')
   if (!bcrypt.compareSync(password, existUser.password)) throw new ApiError(StatusCodes.FAILED_DEPENDENCY, 'Email or password not true!')
 
-  const userInfo = { _id:existUser._id, email: existUser.email }
+  const userInfo = { _id: existUser._id, email: existUser.email }
   //Create access token and user token to login with jsonwebtoken
 
   const accessToken = await JwtProvider.generateToken(
@@ -105,9 +105,25 @@ const getDetail = async (idUser) => {
   }
 }
 
+const refreshToken = async (refreshToken) => {
+  //Giải mã refresh token vừa truyền vào xem có đúng không
+  const decodedRefreshToken = await JwtProvider.verifiedToken(refreshToken, env.REFRESH_TOKEN_SECRET_SIGNATURE)
+  //Lấy dữ liệu user luôn từ dữ liệu đã được giải mã bên trên
+  const userData = {
+    _id: decodedRefreshToken._id,
+    email: decodedRefreshToken.email
+  }
+
+  //Từ dữ liệu vừa rồi tạo ra accessToken mới
+
+  const accessToken = await JwtProvider.generateToken(userData, env.ACCESS_TOKEN_SECRET_SIGNATURE, env.ACCESS_TOKEN_LIFE)
+  return { accessToken }
+}
+
 export const userService = {
   createNew,
   verify,
   login,
-  getDetail
+  getDetail,
+  refreshToken
 }
