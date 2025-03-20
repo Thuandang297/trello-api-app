@@ -10,4 +10,8 @@ userRoute.route('/login').put(userValidation.login, userController.login)
 
 userRoute.route('/:id').get(userController.getUserDetail)
 
+userRoute.route('/logout').delete(userController.logout)
+
+userRoute.route('/refresh-token').post(userController.refreshToken)
+
 export const UsersRouter = userRoute
