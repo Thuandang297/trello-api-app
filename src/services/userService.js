@@ -41,6 +41,11 @@ const createNew = async (reqBody) => {
   }
 }
 
+const updateUser = async (userId, reqBody) => {
+  //find user by id and update with
+  return await userModel.updateData(userId, reqBody)
+}
+
 const verify = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -125,5 +130,6 @@ export const userService = {
   verify,
   login,
   getDetail,
-  refreshToken
+  refreshToken,
+  updateUser
 }

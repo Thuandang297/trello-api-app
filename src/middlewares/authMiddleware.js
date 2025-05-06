@@ -21,7 +21,7 @@ const isAuthorized = async (req, res, next) => {
 
   } catch (error) {
     if (error?.message?.includes('jwt expired')) {
-    //Nếu asscess hết hạn thì trả về mã lỗi cho Fe để gọi refresh
+      //Nếu asscess hết hạn thì trả về mã lỗi cho Fe để gọi refresh
       next(new ApiError(StatusCodes.GONE, 'Access token is empried!'))
       return
     }

@@ -2,10 +2,23 @@ import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
 import ms from 'ms'
 import ApiError from '~/utils/ApiError'
+import { successResponse } from '~/utils/responseHelper'
 const createNew = async (req, res, next) => {
   try {
-    const createdUser= await userService.createNew(req.body)
+    const createdUser = await userService.createNew(req.body)
     res.status(StatusCodes.CREATED).json({ ...createdUser })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updateUser = async (req, res, next) => {
+  const data = req.jwtDecoder
+  try {
+    //get userID by acessToken of header
+    const userId = data._id
+    const updatedUser = await userService.updateUser(userId, req.body)
+    if (updateUser) return successResponse(res, updatedUser, StatusCodes.OK, 'User updated success hura!')
   } catch (error) {
     next(error)
   }
@@ -58,7 +71,7 @@ const logout = async (req, res, next) => {
   try {
     res.clearCookie('accessToken')
     res.clearCookie('refreshToken')
-    res.status(StatusCodes.OK).json({ logout:true })
+    res.status(StatusCodes.OK).json({ logout: true })
   } catch (error) {
     next(error)
   }
@@ -80,4 +93,4 @@ const refreshToken = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNAUTHORIZED, 'Please sign in!'))
   }
 }
-export const userController = { createNew, verify, login, getUserDetail, logout, refreshToken }
+export const userController = { createNew, verify, login, getUserDetail, logout, refreshToken, updateUser }
