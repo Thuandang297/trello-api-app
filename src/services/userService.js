@@ -46,6 +46,30 @@ const updateUser = async (userId, reqBody) => {
   return await userModel.updateData(userId, reqBody)
 }
 
+const changePassword = async (userId, reqBody) => {
+  //find user
+  const currentUser = await userModel.findOneById(userId)
+
+  const { currentPassword, newPassword, confirmPassword } = reqBody
+
+  //Check if newPassword and confirmPassword not correct
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'New password and confirm password not match, please check again!')
+  }
+
+  //Check password is correct
+  if (!bcrypt.compareSync(currentPassword, currentUser.password)) {
+    throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'Password is not correct!')
+  }
+
+  //Hash newPassword
+  const newHashedPassword = await bcrypt.hash(newPassword, 10)
+
+  //Update password
+
+  userModel.updateData(userId, { password: newHashedPassword })
+}
+
 const verify = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -131,5 +155,6 @@ export const userService = {
   login,
   getDetail,
   refreshToken,
-  updateUser
+  updateUser,
+  changePassword
 }

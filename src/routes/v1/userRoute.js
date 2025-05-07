@@ -15,6 +15,8 @@ userRoute.route('/logout').delete(userController.logout)
 
 userRoute.route('/refresh-token').post(userController.refreshToken)
 
-userRoute.route('/update').put(authMiddleware.isAuthorized, userController.updateUser)
+userRoute.route('/update').put(authMiddleware.isAuthorized, userValidation.update, userController.updateUser)
+
+userRoute.route('/change-password').patch(authMiddleware.isAuthorized, userController.changePassword)
 
 export const UsersRouter = userRoute

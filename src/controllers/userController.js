@@ -24,6 +24,21 @@ const updateUser = async (req, res, next) => {
   }
 }
 
+const changePassword = async (req, res, next) => {
+  try {
+    //get userID by acessToken of header
+    const userData = req.jwtDecoder
+    const userId = userData._id
+    const reqBody = req.body
+
+    //update user
+    const updatedUser = await userService.changePassword(userId, reqBody)
+    if (updateUser) return successResponse(res, updatedUser, StatusCodes.OK, 'User updated success hura!')
+  } catch (error) {
+    next(error)
+  }
+}
+
 const verify = async (req, res, next) => {
   try {
     const createdUser = await userService.verify(req.body)
@@ -93,4 +108,4 @@ const refreshToken = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNAUTHORIZED, 'Please sign in!'))
   }
 }
-export const userController = { createNew, verify, login, getUserDetail, logout, refreshToken, updateUser }
+export const userController = { createNew, verify, login, getUserDetail, logout, refreshToken, updateUser, changePassword }

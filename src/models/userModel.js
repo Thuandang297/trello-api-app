@@ -9,7 +9,7 @@ const USER_ROLE = {
 }
 
 //Những trường không muốn cập nhật trong hàm update
-const INVALID_FIELD_UPDATED = ['_id', 'email', 'username', 'createAt']
+const INVALID_FIELD_UPDATED = ['_id', 'email', 'userName', 'createAt']
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
@@ -53,7 +53,7 @@ const findOneByEmail = async (email) => {
   }
 }
 
-const findOneById= async (userId) => {
+const findOneById = async (userId) => {
   try {
     const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne({ _id: new ObjectId(userId) })
     return user
@@ -71,18 +71,16 @@ const validateBeforeUpdate = (body) => {
 const updateData = async (userId, data) => {
   try {
     const validData = validateBeforeUpdate(data)
-    if (!validData) return
+    if (!validData) throw new Error(`Invalid values [ ${Object.keys(data).filter(key => INVALID_FIELD_UPDATED.includes(key))}] has updated !`)
     const updatedData = {
       ...data,
       updatedAt: Date.now()
     }
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate({
       _id: new ObjectId(userId)
-    },
-    {
+    }, {
       $set: updatedData
-    },
-    { returnDocument: 'after', upsert: true })
+    }, { returnDocument: 'after', upsert: true })
     return result
   } catch (error) {
     throw new Error(error)
