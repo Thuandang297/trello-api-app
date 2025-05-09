@@ -41,10 +41,26 @@ const createNew = async (reqBody) => {
   }
 }
 
-const updateUser = async (userId, reqBody) => {
-  //find user by id and update with
-  return await userModel.updateData(userId, reqBody)
-}
+const updateUser = async (userId, reqBody, userDataFile) => {
+  try {
+    // Trường hợp đổi mật khẩu
+    if (reqBody.currentPassword && reqBody.changePassword) {
+      return await changePassword(userId, reqBody);
+    }
+
+    // Trường hợp upload ảnh
+    if (userDataFile) {
+      // TODO: Thêm logic upload file (ví dụ: upload lên Cloudinary)
+      const uploadedImageUrl = await uploadToCloudinary(userDataFile); // Giả sử có hàm uploadToCloudinary
+      reqBody.profileImage = uploadedImageUrl; // Lưu URL ảnh vào thông tin người dùng
+    }
+
+    // Trường hợp cập nhật thông tin thông thường
+    return await userModel.updateData(userId, reqBody);
+  } catch (error) {
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to update user');
+  }
+};
 
 const changePassword = async (userId, reqBody) => {
   //find user
@@ -148,7 +164,11 @@ const refreshToken = async (refreshToken) => {
   const accessToken = await JwtProvider.generateToken(userData, env.ACCESS_TOKEN_SECRET_SIGNATURE, env.ACCESS_TOKEN_LIFE)
   return { accessToken }
 }
+const uploadImage = async (req) => {
+  console.log('🚀 ~ uploadImage ~ req:', req)
+  //validate file
 
+}
 export const userService = {
   createNew,
   verify,
@@ -156,5 +176,6 @@ export const userService = {
   getDetail,
   refreshToken,
   updateUser,
-  changePassword
+  changePassword,
+  uploadImage
 }

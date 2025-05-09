@@ -2,6 +2,7 @@ import express from 'express'
 import { userValidation } from '~/validations/userValidation'
 import { userController } from '~/controllers/userController'
 import authMiddleware from '~/middlewares/authMiddleware'
+import { multerUploadMiddleware } from '~/middlewares/multerMiddleware'
 const userRoute = express.Router()
 userRoute.route('/register').post(userValidation.createNew, userController.createNew)
 
@@ -16,7 +17,5 @@ userRoute.route('/logout').delete(userController.logout)
 userRoute.route('/refresh-token').post(userController.refreshToken)
 
 userRoute.route('/update').put(authMiddleware.isAuthorized, userValidation.update, userController.updateUser)
-
-userRoute.route('/change-password').patch(authMiddleware.isAuthorized, userController.changePassword)
 
 export const UsersRouter = userRoute

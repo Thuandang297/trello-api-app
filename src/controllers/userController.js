@@ -13,31 +13,35 @@ const createNew = async (req, res, next) => {
 }
 
 const updateUser = async (req, res, next) => {
-  const data = req.jwtDecoder
-  try {
-    //get userID by acessToken of header
-    const userId = data._id
-    const updatedUser = await userService.updateUser(userId, req.body)
-    if (updateUser) return successResponse(res, updatedUser, StatusCodes.OK, 'User updated success hura!')
-  } catch (error) {
-    next(error)
-  }
-}
+  console.log('updateUser', req.body);
 
-const changePassword = async (req, res, next) => {
   try {
-    //get userID by acessToken of header
     const userData = req.jwtDecoder
     const userId = userData._id
     const reqBody = req.body
-
-    //update user
-    const updatedUser = await userService.changePassword(userId, reqBody)
+    //get userID by acessToken of header
+    const userDataFile = req.file
+    const updatedUser = await userService.updateUser(userId, reqBody, userDataFile)
     if (updateUser) return successResponse(res, updatedUser, StatusCodes.OK, 'User updated success hura!')
   } catch (error) {
     next(error)
   }
 }
+
+// const changePassword = async (req, res, next) => {
+//   try {
+//     //get userID by acessToken of header
+//     const userData = req.jwtDecoder
+//     const userId = userData._id
+//     const reqBody = req.body
+
+//     //update user
+//     const updatedUser = await userService.changePassword(userId, reqBody)
+//     if (updateUser) return successResponse(res, updatedUser, StatusCodes.OK, 'User updated success hura!')
+//   } catch (error) {
+//     next(error)
+//   }
+// }
 
 const verify = async (req, res, next) => {
   try {
@@ -108,4 +112,13 @@ const refreshToken = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNAUTHORIZED, 'Please sign in!'))
   }
 }
-export const userController = { createNew, verify, login, getUserDetail, logout, refreshToken, updateUser, changePassword }
+
+const uploadImage = async (req, res, next) => {
+  try {
+    console.log('🚀 ~ uploadImage ~ req:', req)
+    // await userService.uploadImage(req)
+  } catch (error) {
+    next(new ApiError(StatusCodes.NOT_ACCEPTABLE, error.message || 'Upload file fail!'))
+  }
+}
+export const userController = { createNew, verify, login, getUserDetail, logout, refreshToken, updateUser, uploadImage }
