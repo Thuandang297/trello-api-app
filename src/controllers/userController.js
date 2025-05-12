@@ -13,8 +13,6 @@ const createNew = async (req, res, next) => {
 }
 
 const updateUser = async (req, res, next) => {
-  console.log('updateUser', req.body);
-
   try {
     const userData = req.jwtDecoder
     const userId = userData._id
@@ -115,7 +113,6 @@ const refreshToken = async (req, res, next) => {
 
 const uploadImage = async (req, res, next) => {
   try {
-    console.log('🚀 ~ uploadImage ~ req:', req)
     // await userService.uploadImage(req)
   } catch (error) {
     next(new ApiError(StatusCodes.NOT_ACCEPTABLE, error.message || 'Upload file fail!'))
