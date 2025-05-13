@@ -8,6 +8,10 @@ var correctConditionCreate = Joi.object({
   password: Joi.string().required().pattern(PASSWORD_RULE).message(PASSWORD_RULE_MESSAGE)
 })
 
+var correctConditionUpdate = Joi.object({
+  displayName: Joi.string()
+})
+
 var correctConditionVerify = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).message(EMAIL_RULE_MESSAGE),
   token: Joi.string().required()
@@ -16,6 +20,15 @@ var correctConditionVerify = Joi.object({
 const createNew = async (req, res, next) => {
   try {
     await correctConditionCreate.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+  }
+}
+
+const update = async (req, res, next) => {
+  try {
+    await correctConditionUpdate.validateAsync(req.body, { abortEarly: false })
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
@@ -41,6 +54,7 @@ const login = async (req, res, next) => {
 }
 export const userValidation = {
   createNew,
+  update,
   verify,
   login
 }

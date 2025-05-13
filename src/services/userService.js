@@ -8,6 +8,7 @@ import { WEBSITE_DOMAIN } from '~/utils/constants'
 import { BrevoProvider } from '~/providers/brevoProvider'
 import { JwtProvider } from '~/providers/JwtProvider'
 import { env } from '~/config/environment'
+import { CloundinaryProvider } from '~/providers/cloundinaryProvider'
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -39,6 +40,54 @@ const createNew = async (reqBody) => {
   } catch (error) {
     throw error
   }
+}
+
+const updateUser = async (userId, reqBody, userDataFile) => {
+  try {
+    // Trường hợp đổi mật khẩu
+    if (reqBody.currentPassword && reqBody.changePassword) {
+      return await changePassword(userId, reqBody)
+    }
+
+    // Trường hợp upload ảnh
+    if (userDataFile && userDataFile.buffer) {
+      // TODO: Thêm logic upload file (ví dụ: upload lên Cloudinary)
+      const uploadedImageUrl = await CloundinaryProvider.uploadToCloudinary(userDataFile.buffer, 'user') // Giả sử có hàm uploadToCloudinary giúp trả vè URL ảnh đã upload
+      if (!uploadedImageUrl) {
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to upload image')
+      }
+      reqBody.avatar = uploadedImageUrl // Lưu URL ảnh vào thông tin người dùng
+    }
+
+    // Trường hợp cập nhật thông tin thông thường
+    return await userModel.updateData(userId, { avatar: reqBody.avatar })
+  } catch (error) {
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to update user')
+  }
+}
+
+const changePassword = async (userId, reqBody) => {
+  //find user
+  const currentUser = await userModel.findOneById(userId)
+
+  const { currentPassword, newPassword, confirmPassword } = reqBody
+
+  //Check if newPassword and confirmPassword not correct
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'New password and confirm password not match, please check again!')
+  }
+
+  //Check password is correct
+  if (!bcrypt.compareSync(currentPassword, currentUser.password)) {
+    throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'Password is not correct!')
+  }
+
+  //Hash newPassword
+  const newHashedPassword = await bcrypt.hash(newPassword, 10)
+
+  //Update password
+
+  userModel.updateData(userId, { password: newHashedPassword })
 }
 
 const verify = async (reqBody) => {
@@ -125,5 +174,7 @@ export const userService = {
   verify,
   login,
   getDetail,
-  refreshToken
+  refreshToken,
+  updateUser,
+  changePassword
 }
