@@ -8,7 +8,7 @@ import { WEBSITE_DOMAIN } from '~/utils/constants'
 import { BrevoProvider } from '~/providers/brevoProvider'
 import { JwtProvider } from '~/providers/JwtProvider'
 import { env } from '~/config/environment'
-import { uploadToCloudinary } from '~/providers/cloundinaryProvider'
+import { CloundinaryProvider } from '~/providers/cloundinaryProvider'
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -50,9 +50,9 @@ const updateUser = async (userId, reqBody, userDataFile) => {
     }
 
     // Trường hợp upload ảnh
-    if (userDataFile) {
+    if (userDataFile && userDataFile.buffer) {
       // TODO: Thêm logic upload file (ví dụ: upload lên Cloudinary)
-      const uploadedImageUrl = await uploadToCloudinary(userDataFile) // Giả sử có hàm uploadToCloudinary giúp trả vè URL ảnh đã upload
+      const uploadedImageUrl = await CloundinaryProvider.uploadToCloudinary(userDataFile.buffer, 'user') // Giả sử có hàm uploadToCloudinary giúp trả vè URL ảnh đã upload
       if (!uploadedImageUrl) {
         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to upload image')
       }
@@ -60,7 +60,7 @@ const updateUser = async (userId, reqBody, userDataFile) => {
     }
 
     // Trường hợp cập nhật thông tin thông thường
-    return await userModel.updateData(userId, reqBody)
+    return await userModel.updateData(userId, { avatar: reqBody.avatar })
   } catch (error) {
     throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to update user')
   }
@@ -168,10 +168,7 @@ const refreshToken = async (refreshToken) => {
   const accessToken = await JwtProvider.generateToken(userData, env.ACCESS_TOKEN_SECRET_SIGNATURE, env.ACCESS_TOKEN_LIFE)
   return { accessToken }
 }
-const uploadImage = async (req) => {
-  //validate file
 
-}
 export const userService = {
   createNew,
   verify,
@@ -179,6 +176,5 @@ export const userService = {
   getDetail,
   refreshToken,
   updateUser,
-  changePassword,
-  uploadImage
+  changePassword
 }
