@@ -28,6 +28,12 @@ const updateBoard = async (req) => {
   }
 }
 
+const getAllBoards = async (userId, page, size) => {
+  const boards = await boardModel.getAllBoards(userId, page, size)
+  if (!boards) throw new ApiError(StatusCodes.NOT_FOUND, 'Can not find the boards')
+  return boards
+}
+
 const findBoardById = async (boardId) => {
   const boardDetail = await boardModel.getDetails(boardId)
   if (!boardDetail) throw new ApiError(StatusCodes.NOT_FOUND, 'Can not find the board')
@@ -49,5 +55,6 @@ const findBoardById = async (boardId) => {
 export const boardService = {
   createNew,
   updateBoard,
-  findBoardById
+  findBoardById,
+  getAllBoards
 }

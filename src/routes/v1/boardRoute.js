@@ -6,6 +6,7 @@ const boardRoute = express.Router()
 
 boardRoute.route('/')
   .post(authMiddleware.isAuthorized, boardValidation.createNew, boardController.createNew)
+  .get(authMiddleware.isAuthorized, boardController.getBoards)
 
 boardRoute.route('/:id')
   .put(authMiddleware.isAuthorized, boardValidation.updateData, boardController.updateData)
