@@ -1,11 +1,12 @@
 import { StatusCodes } from 'http-status-codes'
 import { boardService } from '~/services/boardService'
 import { PAGE_DEFAULT, SIZE_DEFAULT } from '~/utils/constants'
+import ListResponse from '~/utils/ListResponse'
 import { successResponse } from '~/utils/responseHelper'
 const createNew = async (req, res, next) => {
   try {
     const createdBoard = await boardService.createNew(req.body)
-    res.status(StatusCodes.CREATED).json({ createdBoard })
+    return successResponse(res, createdBoard, StatusCodes.CREATED, 'Create board successfully')
   } catch (error) {
     next(error)
   }
@@ -24,7 +25,11 @@ const getBoards = async (req, res, next) => {
     if (!boards) {
       throw new Error(StatusCodes.NOT_FOUND, 'Can not find the boards')
     }
-    return successResponse(res, boards, StatusCodes.OK, '')
+    const dataBoard = new ListResponse(boards, 8, pageNumber, limitNumber)
+    if (!dataBoard || dataBoard.items.length === 0) {
+      return successResponse(res, [], StatusCodes.OK, 'No boards found')
+    }
+    return successResponse(res, dataBoard, StatusCodes.OK, 'Successfully retrieved boards')
 
   } catch (error) {
     next(error)

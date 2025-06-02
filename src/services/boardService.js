@@ -8,11 +8,10 @@ import { mapOrder } from '~/utils/sorts'
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const newBoard = {
+    return await boardModel.createNew({
       ...reqBody,
       slug: slugify(reqBody?.title)
-    }
-    return await boardModel.createNew(newBoard)
+    })
   } catch (error) {
     throw error
   }

@@ -51,9 +51,7 @@ const updateBoard = async (req) => {
     }
     const updatedData = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({
       _id: new ObjectId(boardId)
-    },
-      { $set: updateFields },
-      { returnDocument: 'after', upsert: true })
+    }, { $set: updateFields }, { returnDocument: 'after', upsert: true })
     return updatedData
   } catch (error) {
     throw new Error(error)
@@ -134,22 +132,37 @@ const getDetails = async (boardId) => {
 
 const getAllBoards = async (userId, page, sizePage) => {
   try {
-
-    //get contidion
+    // Điều kiện lọc
     const listCondition = [
-      //Condition for board not get detroyed
-      { _destroy: false },
-
-      //Check that board is belong to user
+      { _destroy: false } // Board chưa bị xóa
       // {
-      //   $or: [{ ownerIds: { $all: [new ObjectId(userId)] } }, { memberIds: { $all: [new ObjectId(userId)] } }]
+      //   $or: [
+      //     { ownerIds: { $all: [new ObjectId(userId)] } }, // Board thuộc sở hữu của user
+      //     { memberIds: { $all: [new ObjectId(userId)] } } // Board mà user là thành viên
+      //   ]
       // }
     ]
-    return await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([{
-      $match: {
-        $and: listCondition
+
+    // Tính toán giá trị skip và limit cho phân trang
+    const skip = (page - 1) * sizePage
+    const limit = sizePage
+
+    // Thực hiện query với phân trang
+    const boards = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
+      {
+        $match: {
+          $and: listCondition
+        }
+      },
+      {
+        $skip: skip // Bỏ qua số lượng bản ghi
+      },
+      {
+        $limit: limit // Giới hạn số lượng bản ghi
       }
-    }]).toArray()
+    ]).toArray()
+
+    return boards
   } catch (error) {
     throw new Error(error)
   }

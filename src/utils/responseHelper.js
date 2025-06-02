@@ -8,11 +8,13 @@ export const successResponse = (res, data, status = 200, message = 'Success') =>
   })
 }
 
-export const errorResponse = (res, message = 'Something went wrong', errorCode = 'UNKNOWN_ERROR', status = 400) => {
+export const errorResponse = (res, message = 'Something went wrong', errorCode = 'UNKNOWN_ERROR', status = 400, stack = '') => {
   return res.status(status).json({
+    status,
     success: false,
     message,
     data: null,
-    errorCode
+    errorCode,
+    stack
   })
 }
