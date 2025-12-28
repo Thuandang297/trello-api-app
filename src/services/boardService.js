@@ -8,11 +8,10 @@ import { mapOrder } from '~/utils/sorts'
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const newBoard = {
+    return await boardModel.createNew({
       ...reqBody,
       slug: slugify(reqBody?.title)
-    }
-    return await boardModel.createNew(newBoard)
+    })
   } catch (error) {
     throw error
   }
@@ -26,6 +25,12 @@ const updateBoard = async (req) => {
   } catch (error) {
     throw error
   }
+}
+
+const getAllBoards = async (userId, page, size) => {
+  const boards = await boardModel.getAllBoards(userId, page, size)
+  if (!boards) throw new ApiError(StatusCodes.NOT_FOUND, 'Can not find the boards')
+  return boards
 }
 
 const findBoardById = async (boardId) => {
@@ -49,5 +54,6 @@ const findBoardById = async (boardId) => {
 export const boardService = {
   createNew,
   updateBoard,
-  findBoardById
+  findBoardById,
+  getAllBoards
 }

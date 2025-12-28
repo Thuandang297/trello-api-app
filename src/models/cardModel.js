@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { columnModel } from './columnModel'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 // Define Collection (name & schema)
 const CARD_COLLECTION_NAME = 'cards'
 const CARD_COLLECTION_SCHEMA = Joi.object({
@@ -56,7 +58,7 @@ const createNew = async (data) => {
 const updateData = async (cardId, data) => {
   try {
     const validData = validateBeforeUpdate(data)
-    if (!validData) return
+    if (!validData) {throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'Invalid data have key not allow to update')}
     const updatedData = {
       ...data,
       updatedAt: Date.now()

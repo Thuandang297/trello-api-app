@@ -6,15 +6,15 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { columnModel } from './columnModel'
 import { cardModel } from './cardModel'
 
-const BOARD_COLLECTION_NAME ='board'
-const BOARD_COLLECTION_SCHEMA =Joi.object({
+const BOARD_COLLECTION_NAME = 'board'
+const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim().strict(),
   slug: Joi.string().required().min(3).trim().strict(),
   description: Joi.string().required().min(3).max(256).trim().strict(),
   columnOrderIds: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
-  createdAt:Joi.date().timestamp('javascript').default(Date.now),
-  updatedAt:Joi.date().timestamp('javascript').default(null),
-  _destroy:Joi.boolean().default(false),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+  _destroy: Joi.boolean().default(false),
   type: Joi.string().valid(TYPE_BOARDS.PRIVATE, TYPE_BOARDS.PUBLIC).required(),
   ownerIds: Joi.array().items(Joi.string()).default([]),
   memberIds: Joi.array().items(Joi.string()).default([])
@@ -51,9 +51,7 @@ const updateBoard = async (req) => {
     }
     const updatedData = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({
       _id: new ObjectId(boardId)
-    },
-    { $set: updateFields },
-    { returnDocument: 'after', upsert: true })
+    }, { $set: updateFields }, { returnDocument: 'after', upsert: true })
     return updatedData
   } catch (error) {
     throw new Error(error)
@@ -74,7 +72,7 @@ const pushInColumnOrderIds = async (boardId, columnId) => {
     const updatedBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({
       _id: new ObjectId(boardId)
     }, {
-      $push:{
+      $push: {
         columnOrderIds: columnId.toString()
       }
     }, { returnDocument: 'after' })
@@ -132,7 +130,45 @@ const getDetails = async (boardId) => {
   }
 }
 
-export const boardModel ={
+const getAllBoards = async (userId, page, sizePage) => {
+  try {
+    // Điều kiện lọc
+    const listCondition = [
+      { _destroy: false } // Board chưa bị xóa
+      // {
+      //   $or: [
+      //     { ownerIds: { $all: [new ObjectId(userId)] } }, // Board thuộc sở hữu của user
+      //     { memberIds: { $all: [new ObjectId(userId)] } } // Board mà user là thành viên
+      //   ]
+      // }
+    ]
+
+    // Tính toán giá trị skip và limit cho phân trang
+    const skip = (page - 1) * sizePage
+    const limit = sizePage
+
+    // Thực hiện query với phân trang
+    const boards = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
+      {
+        $match: {
+          $and: listCondition
+        }
+      },
+      {
+        $skip: skip // Bỏ qua số lượng bản ghi
+      },
+      {
+        $limit: limit // Giới hạn số lượng bản ghi
+      }
+    ]).toArray()
+
+    return boards
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
@@ -140,5 +176,6 @@ export const boardModel ={
   getDetails,
   updateBoard,
   pushInColumnOrderIds,
-  pullColumnIdInBoard
+  pullColumnIdInBoard,
+  getAllBoards
 }
